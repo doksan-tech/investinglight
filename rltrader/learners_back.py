@@ -245,8 +245,6 @@ class ReinforcementLearner:
         max_portfolio_value = 0
         epoch_win_cnt = 0
 
-        logger.debug('epoch,epsilon,num_exploration,num_buy,num_sell,num_hold,num_stocks,pv,loss')  # 수정
-        
         # 에포크 반복
         for epoch in tqdm(range(self.num_epoches)):
             time_start_epoch = time.time()
@@ -316,15 +314,11 @@ class ReinforcementLearner:
             epoch_str = str(epoch + 1).rjust(num_epoches_digit, '0')
             time_end_epoch = time.time()
             elapsed_time_epoch = time_end_epoch - time_start_epoch
-            
-            logger.debug(f'{epoch_str},{epsilon:.4f},{self.exploration_cnt},'             # 수정
-                         f'{self.agent.num_buy},{self.agent.num_sell},{self.agent.num_hold},'
-                         f'{self.agent.num_stocks},{self.agent.portfolio_value:.0f},{self.loss:.6f}')
-            # logger.debug(f'stock_code:{self.stock_code},epoch:{epoch_str},'
-            #              f'epsilon:{epsilon:.4f},exploration_ratio:{self.exploration_cnt}/{self.itr_cnt},' 
-            #              f'num_buy:{self.agent.num_buy},num_sell:{self.agent.num_sell},num_hold:{self.agent.num_hold},'
-            #              f'num_stocks:{self.agent.num_stocks},pv:{self.agent.portfolio_value:,.0f},'
-            #              f'loss:{self.loss:.6f}')
+            logger.debug(f'[{self.stock_code}][Epoch {epoch_str}/{self.num_epoches}] '
+                         f'Epsilon:{epsilon:.4f} #Expl.:{self.exploration_cnt}/{self.itr_cnt} '
+                         f'#Buy:{self.agent.num_buy} #Sell:{self.agent.num_sell} #Hold:{self.agent.num_hold} '
+                         f'#Stocks:{self.agent.num_stocks} PV:{self.agent.portfolio_value:,.0f} '
+                         f'Loss:{self.loss:.6f} ET:{elapsed_time_epoch:.4f}')
 
             # 에포크 관련 정보 가시화
             if self.num_epoches == 1 or (epoch + 1) % int(self.num_epoches / 10) == 0:
