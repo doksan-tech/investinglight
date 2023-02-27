@@ -1,1 +1,4 @@
-data/
+data/v3/
+quantylab/rltrader/__pycache__/
+data/v3/
+.idea/
