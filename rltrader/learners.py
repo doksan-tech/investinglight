@@ -245,7 +245,7 @@ class ReinforcementLearner:
         max_portfolio_value = 0
         epoch_win_cnt = 0
 
-        logger.debug('epoch,epsilon,num_exploration,num_buy,num_sell,num_hold,num_stocks,pv,loss')  # 수정
+        logger.debug('epochs,epsilon,num_exploration,num_buy,num_sell,num_hold,num_stocks,pv,loss')  # 수정
         
         # 에포크 반복
         for epoch in tqdm(range(self.num_epoches)):
