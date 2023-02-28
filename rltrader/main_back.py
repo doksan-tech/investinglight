@@ -45,7 +45,7 @@ if __name__ == '__main__':
     # 시작 탐험률
     start_epsilon = 1 if args.mode in ['train', 'update'] else 0
     # 수행할 에포크 수
-    num_epoches = 1000 if args.mode in ['train', 'update'] else 1
+    num_epoches = 10 if args.mode in ['train', 'update'] else 1
     # LSTM, CNN에서 사용할 step 크기
     num_steps = 5 if args.net in ['lstm', 'cnn'] else 1
 
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     # https://docs.python.org/ko/3.8/howto/logging.html
     # BASE_DIR/output/train_20230219_dqn_lstm/train_20230219_dqn_lstm.log
     # TODO: StreamHandler - FileHandler 차이
-    log_path = os.path.join(settings.BASE_DIR, 'output', 'epoch.log')  # 수정
+    log_path = os.path.join(output_path, f'{output_name}.log')
     if os.path.exists(log_path):
         os.remove(log_path)
     logging.basicConfig(format='%(message)s')  # 화면에 출력할 내용
@@ -95,7 +95,7 @@ if __name__ == '__main__':
     file_handler.setLevel(logging.DEBUG)
     logger.addHandler(stream_handler)
     logger.addHandler(file_handler)
-    logger.info(params)  # 파라미터 로그 파일에 기록
+    logger.info(params)  # 프로그램의 정상 작동 중에 발생하는 이벤트 보고
 
     # Backend 설정, 로그 설정을 먼저하고 RLTrader 모듈들을 이후에 임포트해야 함
     from learners import ReinforcementLearner, DQNLearner, \

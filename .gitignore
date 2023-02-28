@@ -1,6 +1,5 @@
-data/v3/
-quantylab/rltrader/__pycache__/
-data/v3/
-.idea/
-models/
-output/
+__pycache__
+.idea
+data
+output
+models
