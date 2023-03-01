@@ -7,7 +7,7 @@ import plotly.express as px                 # 5.13.0
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc     # 1.3.1
 from rltrader.settings import BASE_DIR
-
+# from app import dashapp
 
 # 로그 분석 ---------------------
 log_path = os.path.abspath(os.path.join(BASE_DIR, 'output/epoch.log'))
@@ -103,14 +103,14 @@ candle_chart.update_layout(
 
 # 레이아웃 -----------------------------------------------------------------
 
-application = flask.Flask(__name__)
-dashapp = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], 
-               meta_tags=[{'name': 'viewport', 'content': 'width=device-width, initial-scale=1.0'}], 
-               server = application, url_base_pathname='/chart/')
+# application = flask.Flask(__name__)
+# dashapp = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], 
+#                meta_tags=[{'name': 'viewport', 'content': 'width=device-width, initial-scale=1.0'}], 
+#                server = application, url_base_pathname='/chart/')
 
-@application.route('/')
-def index():
-    return 'index'
+# @application.route('/')
+# def index():
+#     return 'index'
 
 dashapp.layout = dbc.Container([
     dbc.Row(dbc.Col(html.H1('삼성전자 강화학습 결과', 
@@ -149,6 +149,6 @@ dashapp.layout = dbc.Container([
     ], justify="around", align="loss_chart"),
 ], fluid=True)
 
-if __name__ == "__main__":
-    application.debug=True
-    application.run()
+# if __name__ == "__main__":
+#     application.debug=True
+#     application.run()

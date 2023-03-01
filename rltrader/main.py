@@ -45,7 +45,7 @@ if __name__ == '__main__':
     # 시작 탐험률
     start_epsilon = 1 if args.mode in ['train', 'update'] else 0
     # 수행할 에포크 수
-    num_epoches = 1000 if args.mode in ['train', 'update'] else 1
+    num_epoches = 10 if args.mode in ['train', 'update'] else 1
     # LSTM, CNN에서 사용할 step 크기
     num_steps = 5 if args.net in ['lstm', 'cnn'] else 1
 

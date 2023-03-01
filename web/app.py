@@ -1,18 +1,21 @@
 import os
+import time
 import pandas as pd
 from sqlalchemy import create_engine, text as sql_text
 from flask import Flask, render_template, request
-import time
+# from dash import Dash
+# import dash_bootstrap_components as dbc     # 1.3.1
+import dash_app
+
+from rltrader.settings import BASE_DIR
+main_path = os.path.abspath(os.path.join(BASE_DIR, 'rltrader/main.py'))
 
 app = Flask(__name__)
 engine = create_engine(os.getenv("DATABASE_URL"))
-#query = 'select * from marketfeatures;'
-#query2 = 'select * from stocks;'
-#df_market = pd.read_sql_query(con=engine.connect(), sql=sql_text(query))
-#df_stock = pd.read_sql_query(con=engine.connect(), sql=sql_text(query2))
-#market_col = list(df_market.columns)
-#stock_col = list(df_stock.columns)
-#all_col = market_col + stock_col
+
+dashapp = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], 
+               meta_tags=[{'name': 'viewport', 'content': 'width=device-width, initial-scale=1.0'}], 
+               server = app, url_base_pathname='/chart/')
 
 def reinforcement_learning_func():
     time.sleep(2)
@@ -53,10 +56,10 @@ def register():
     if s_size == 0 or check == 0:
         return render_template("choose_again.html")
     else:
-        command = "python /home/skatlqwktjd/investinglight/rltrader/main.py --name "+name+" --stock_code "+var1+" --rl_method "+rl_method+" --net "+net+" --start_date "+var2+" --end_date "+var3
+        command = f"python {main_path} --name {name} --stock_code {var1} --rl_method {rl_method} --net {net} --start_date {var2} --end_date {var3}"
         os.system(command)
-        return render_template("result.html")
-
+        # return render_template("result.html")
+        return redirect('/chart')
 
 if __name__ == '__main__':
-    app.run(port=8002)
+    app.run(port=8050)
