@@ -22,7 +22,7 @@ def init_dash(server):
     )
     
     # Load DataFrame
-    stock_df, log_df, params, learner, result = getdata('output.log')
+    stock_df, log_df, params, learner, result = getdata('epoch.log')
 
     # Candle chart
     # stock_df = stock_df.reset_index(drop=True)
@@ -56,9 +56,9 @@ def init_dash(server):
     )
     
     # PV chart
-    df_pv = log_df.loc[:, ['epoch', 'pv', 'loss']]
+    df_pv = log_df.loc[:, ['epochs', 'pv', 'loss']]
     df_pv = df_pv.astype('float')
-    pv_chart = px.line(df_pv, x='epoch', y='pv')
+    pv_chart = px.line(df_pv, x='epochs', y='pv')
     pv_chart.add_hline(y=int(params['balance']), line_width=1, line_color="red")
     pv_chart.update_layout(
         font={'size':10},
@@ -72,7 +72,7 @@ def init_dash(server):
                         gridcolor='Lightgray')
 
     # loss chart
-    loss_chart = px.line(df_pv, x='epoch', y='loss')
+    loss_chart = px.line(df_pv, x='epochs', y='loss')
     loss_chart.update_layout(
         font={'size':10},
         margin=dict(t=20, b=20, l=10, r=10),
@@ -100,7 +100,8 @@ def init_dash(server):
                     dbc.CardBody([
                         html.H3('평균 매매 비율', className='text-center text-danger'),
                         dcc.Graph(figure=pie_chart),
-                        html.P('에포크를 반복하며 매수, 매도, 관망한 평균 비율', className='card-text mb-5'),
+                        html.P('에포크를 반복하며 에이전트가 매수, 매도, 관망한 행동을 평균내어 비율화', 
+                               className='card-text mb-5'),
                     ]),
                 ]),
             ], xs=12, sm=12, md=12, lg=4, xl=4 ),
