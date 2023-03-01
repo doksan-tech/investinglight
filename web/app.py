@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, text as sql_text
 from flask import Flask, render_template, request
 # from dash import Dash
 # import dash_bootstrap_components as dbc     # 1.3.1
-import dash_app
+
 
 from rltrader.settings import BASE_DIR
 main_path = os.path.abspath(os.path.join(BASE_DIR, 'rltrader/main.py'))
@@ -13,9 +13,7 @@ main_path = os.path.abspath(os.path.join(BASE_DIR, 'rltrader/main.py'))
 app = Flask(__name__)
 engine = create_engine(os.getenv("DATABASE_URL"))
 
-dashapp = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], 
-               meta_tags=[{'name': 'viewport', 'content': 'width=device-width, initial-scale=1.0'}], 
-               server = app, url_base_pathname='/chart/')
+
 
 def reinforcement_learning_func():
     time.sleep(2)
