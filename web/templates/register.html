@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-3">
+  <form action="/register" method="post">
+    <div class="mb-0">
+      <label class="form-label" for="lname">작업 이름</label><br>
+      <input id="lname" type="text" name="name" class="form-control" placeholder="파일명으로 사용되니 영어로 입력하세요."><br>
+    </div>
+    <div class="mb-0">
+      <label class="form-label" for="mode">작업 선택</label><br>
+      <input id="mode" type="text" name="mode" class="form-control" placeholder="train, test, predict, update 중 하나를 입력하세요."><br>
+    </div>
+    <div class="mb-0">
+      <label class="form-label" for="stock_name">종목명</label><br>
+      <input id="stock_name" type="text" name="s_name" class="form-control" placeholder="주식 종목명을 입력하세요."><br>
+    </div>
+    <div class="mb-0">
+      <label class="form-label" for="rlmethod">강화학습 알고리즘 선택</label><br>
+      <input id="rlmethod" type="text" name="rl_method" class="form-control" placeholder="dqn, pg, ac, a2c, a3c 중 하나를 입력하세요."><br>
+    </div>
+    <div class="mb-0">
+      <label class="form-label" for="net">딥러닝 알고리즘 선택</label><br>
+      <input id="net" type="text" name="network" class="form-control" placeholder="dnn, lstm, cnn 중 하나를 입력하세요."><br>
+    </div>
+    <div class="row justify-content-evenly">
+      <div class="col">
+        <label class="form-label" for="s_date">시작일</label><br>
+        <input id="s_date" type="date" name="start_date" class="form-control"><br>
+      </div>
+      <div class="col">
+        <label class="form-label" for="e_date">종료일</label><br>
+        <input id="e_date" type="date" name="end_date" class="form-control"><br>
+      </div>
+    </div>
+    <input type="submit" value="SUBMIT" class="btn btn-primary">
+  </form>
+</div>
+{% endblock %}

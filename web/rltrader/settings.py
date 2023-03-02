@@ -1,7 +1,7 @@
 import os
 import locale
 import platform
-from ..config import PROJECT_BASE_DIR
+
 # 로거 이름
 LOGGER_NAME = 'rltrader'
 
@@ -10,8 +10,7 @@ LOGGER_NAME = 'rltrader'
 # BASE_DIR = os.environ.get('RLTRADER_BASE',
 #     os.path.abspath(os.path.join(__file__, os.path.pardir, os.path.pardir, os.path.pardir)))
 # -> RLTRADER_BASE 환경 변수가 존재하면 그 값을 사용하고, 없으면 settings 모듈 기준으로 세 번째 상위 폴더 선택하라.
-# BASE_DIR = os.path.abspath(os.path.join(__file__, os.path.pardir, os.path.pardir))
-BASE_DIR = PROJECT_BASE_DIR
+BASE_DIR = os.path.abspath(os.path.join(__file__, os.path.pardir, os.path.pardir, os.path.pardir))
 
 
 # 리눅스와 맥에서 한국어 지원 위해 로케일 설정 -> 한글 시간 사용하기(%Y년 %m월 %d일)

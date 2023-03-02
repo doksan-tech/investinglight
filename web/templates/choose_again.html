@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>BBB</title>
-    </head>
-    <body>
-        <form action="/">
-            제대로 입력해주세요<br>
-            <input type="submit" value="Return Main">
-        </form>
-    </body>
-</html>
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-3">
+    <h2>안내에 따라 입력해주세요</h2>
+    <a href="{{ url_for('main.register') }}">돌아가기</a>
+</div>
+{% endblock %}

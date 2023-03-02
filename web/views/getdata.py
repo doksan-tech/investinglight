@@ -1,18 +1,23 @@
 """Prepare data for Plotly Dash"""
-import os, json
+import os, sys, json
 import pandas as pd
 from sqlalchemy import create_engine, text as sql_text
 
 # get project root directory
-BASE_DIR = os.path.abspath(os.path.join(__file__, '../../..'))
+BASE_DIR = os.path.abspath(os.path.join(__file__, os.path.pardir, os.path.pardir))
 
 # connect db
 engine = create_engine(os.getenv("DATABASE_URL"))
 
-def getdata(logfile):
+def getdata():
     
     log_path = os.path.abspath(os.path.join(BASE_DIR, 'output', logfile))
-
+    
+    file_list = os.listdir(log_path)
+    
+    print(file_list)
+    sys.exit(0)
+    
     with open(log_path, 'r') as f:
         lines = f.readlines()
     

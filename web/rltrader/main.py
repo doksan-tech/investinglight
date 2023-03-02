@@ -57,7 +57,7 @@ def rltrader(mode='train', ver='v3', name='test', stock_code_list=['005930'],
     log_path = os.path.join(settings.BASE_DIR, 'output', log_name)  # 수정
     if os.path.exists(log_path):
         os.remove(log_path)
-    logging.basicConfig(format='%(message)s')  # 화면에 출력할 내용
+    logging.basicConfig(format='%(message)s', filemode='w')  # 화면에 출력할 내용
     logger = logging.getLogger(settings.LOGGER_NAME)  # logger 생성
     logger.setLevel(logging.DEBUG)  # 상세한 정보. 보통 문제를 진단할 때만 필요
     logger.propagate = False  # TODO: 모르겠음
