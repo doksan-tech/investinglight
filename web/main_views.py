@@ -1,26 +1,31 @@
-"""Routes for parent Flask app."""
-import os, sys
+import requests
+from os import environ, path
 import pandas as pd
-from flask import current_app as app
-from flask import render_template, request, redirect, jsonify
+from flask import Blueprint, url_for, request, redirect, render_template, jsonify
 from sqlalchemy import create_engine, text as sql_text
 
-from rltrader.main import rltrader
+from . import config
+from .rltrader.main import rltrader
 
-BASE_DIR = os.path.abspath(os.path.join(__file__, '../..'))
+bp = Blueprint('main', __name__, url_prefix='/')
 
-@app.route("/")
+@bp.route('/hello')
+def hello():
+    return 'Hello bp'
+
+@bp.route('/')
 def home():
     """매개변수 입력 화면"""
     return render_template("main.html")
 
-@app.route('/register', methods=['post'])
+@bp.route('/register', methods=['post'])
 def register():
     stock_code = []
-    main_path = os.path.abspath(os.path.join(BASE_DIR, 'rltrader/main.py'))
-    engine = create_engine(os.getenv("DATABASE_URL"))
+    main_path = path.abspath(path.join(config.BASE_DIR, 'rltrader/trader.py'))
+    engine = create_engine(environ.get("DATABASE_URL"))
     
     name = request.form["name"]
+    mode = request.form["mode"]
     stock_name = request.form["s_name"]
     rl_method = request.form["rl_method"]
     net = request.form["network"]
@@ -48,8 +53,8 @@ def register():
     if s_size == 0 or check == 0:
         return render_template("choose_again.html")
     else:
-        rltrader(name=name, stock_code_list=stock_code,
+        rltrader(name=name, mode=mode, stock_code_list=stock_code,
                  rl_method=rl_method,  net=net,
                  start_date=start_date, end_date=end_date,
                  )
-        return redirect('/learnchart')
+        return 'Training Done'

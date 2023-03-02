@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 
-import settings
+from . import settings
 
 COLUMNS_CHART_DATA = ['date', 'open', 'high', 'low', 'close', 'volume']
 
@@ -285,16 +285,20 @@ def load_data_v3_v4(code, date_from, date_to, ver):
     df_marketfeatures = pd.read_csv(
         os.path.join(settings.BASE_DIR, 'data', ver, 'marketfeatures.csv'),
         thousands=',', header=0, converters={'date': lambda x: str(x)})
-
+    
     # 종목 데이터
-    df_stockfeatures = None
-    for filename in os.listdir(os.path.join(settings.BASE_DIR, 'data', ver)):
-        if filename.startswith(code):
-            df_stockfeatures = pd.read_csv(
-                os.path.join(settings.BASE_DIR, 'data', ver, filename),
+    df_stockfeatures = pd.read_csv(
+                os.path.join(settings.BASE_DIR, 'data', ver, '005930.csv'),
                 thousands=',', header=0, converters={'date': lambda x: str(x)})
-            break
+    # for filename in os.listdir(os.path.join(settings.BASE_DIR, 'data', ver)):
+    #     if filename.startswith(code):
+    #         df_stockfeatures = pd.read_csv(
+    #             os.path.join(settings.BASE_DIR, 'data', ver, filename),
+    #             thousands=',', header=0, converters={'date': lambda x: str(x)})
+    #         break
 
+    # print(df_marketfeatures.head(2))
+    # print(df_stockfeatures.head(2))
     # 시장 데이터와 종목 데이터 합치기
     df = pd.merge(df_stockfeatures, df_marketfeatures, on='date', how='left', suffixes=('', '_dup'))
     df = df.drop(df.filter(regex='_dup$').columns.tolist(), axis=1)
@@ -304,7 +308,7 @@ def load_data_v3_v4(code, date_from, date_to, ver):
 
     # 기간 필터링
     df['date'] = df['date'].str.replace('-', '')
-    df = df[(df['date'] >= date_from) & (df['date'] <= date_to)]
+    df = df[(df['date'] >= str(date_from)) & (df['date'] <= str(date_to))]
     df = df.fillna(method='ffill').reset_index(drop=True)
 
     # 데이터 조정

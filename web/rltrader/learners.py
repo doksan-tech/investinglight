@@ -7,11 +7,11 @@ import time
 import json
 import numpy as np
 from tqdm import tqdm
-from environment import Environment
-from agent import Agent
-from networks import Network, DNN, LSTMNetwork, CNN
-from visualizer import Visualizer
-import utils, settings
+from .environment import Environment
+from .agent import Agent
+from .networks import Network, DNN, LSTMNetwork, CNN
+from .visualizer import Visualizer
+from . import utils, settings
 # import pandas as pd              ################# 수정
 
 logger = logging.getLogger(settings.LOGGER_NAME)
@@ -219,19 +219,19 @@ class ReinforcementLearner:
         self.visualizer.save(os.path.join(self.epoch_summary_dir, f'epoch_summary_{epoch_str}.png'))
 
     def run(self, learning=True):
-        info = (
+        info = (          # 수정
             f'[{self.stock_code}] RL:{self.rl_method} NET:{self.net} '
             f'LR:{self.lr} DF:{self.discount_factor} '
         )
-        with self.lock:
-            logger.debug(info)
+        # with self.lock:
+        #     logger.debug(info)
 
         # 시작 시간
         time_start = time.time()
 
         # 가시화 준비
         # 차트 데이터는 변하지 않으므로 미리 가시화
-        self.visualizer.prepare(self.environment.chart_data, info)
+        self.visualizer.prepare(self.environment.chart_data, info) 
 
         # 가시화 결과 저장할 폴더 준비
         self.epoch_summary_dir = os.path.join(self.output_path, f'epoch_summary_{self.stock_code}')
@@ -244,8 +244,8 @@ class ReinforcementLearner:
         # 학습에 대한 정보 초기화
         max_portfolio_value = 0
         epoch_win_cnt = 0
-
-        logger.debug('epochs,epsilon,num_exploration,num_buy,num_sell,num_hold,num_stocks,pv,loss')  # 수정
+        
+        logger.debug('stockcode,epochs,epsilon,num_exploration,num_buy,num_sell,num_hold,num_stocks,pv,loss,rl_method,net,lr,discount_factor')  # 수정
         
         # 에포크 반복
         for epoch in tqdm(range(self.num_epoches)):
@@ -316,10 +316,11 @@ class ReinforcementLearner:
             epoch_str = str(epoch + 1).rjust(num_epoches_digit, '0')
             time_end_epoch = time.time()
             elapsed_time_epoch = time_end_epoch - time_start_epoch
-            
-            logger.debug(f'{epoch_str},{epsilon:.4f},{self.exploration_cnt},'             # 수정
+        
+            logger.debug(f'{self.stock_code},{epoch_str},{epsilon:.4f},{self.exploration_cnt},'             # 수정
                          f'{self.agent.num_buy},{self.agent.num_sell},{self.agent.num_hold},'
-                         f'{self.agent.num_stocks},{self.agent.portfolio_value:.0f},{self.loss:.6f}')
+                         f'{self.agent.num_stocks},{self.agent.portfolio_value:.0f},{self.loss:.6f}'
+                         f'{self.lr},{self.discount_factor}')
             # logger.debug(f'stock_code:{self.stock_code},epoch:{epoch_str},'
             #              f'epsilon:{epsilon:.4f},exploration_ratio:{self.exploration_cnt}/{self.itr_cnt},' 
             #              f'num_buy:{self.agent.num_buy},num_sell:{self.agent.num_sell},num_hold:{self.agent.num_hold},'
@@ -341,9 +342,9 @@ class ReinforcementLearner:
         elapsed_time = time_end - time_start
 
         # 학습 관련 정보 로그 기록
-        with self.lock:
-            logger.debug(f'[{self.stock_code}] Elapsed Time:{elapsed_time:.4f} '
-                         f'Max PV:{max_portfolio_value:,.0f} #Win:{epoch_win_cnt}')
+        # with self.lock:           # 수정
+        #     logger.debug(f'[{self.stock_code}] Elapsed Time:{elapsed_time:.4f} '
+        #                  f'Max PV:{max_portfolio_value:,.0f} #Win:{epoch_win_cnt}')
 
     def save_models(self):
         if self.value_network is not None and self.value_network_path is not None:

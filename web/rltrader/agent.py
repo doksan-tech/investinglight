@@ -1,7 +1,7 @@
 # 투자 행동 수행 및 투자금과 보유 주식 관리
 
 import numpy as np
-import utils
+from . import utils
 
 
 class Agent:

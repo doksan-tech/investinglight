@@ -6,22 +6,25 @@
   <body>
     <form action="/register" method="post">
       
-      <label for="lname">Train Set Name:</label><br>
-      <input id="lname" type="text" name="name" value=""><br>
+      <label for="lname">작업 이름</label><br>
+      <input id="lname" type="text" name="name" value="" placeholder=""><br>
 
-      <label for="stock_name">Stock Name</label><br>
-      <input id="stock_name" type="text" name="s_name" value=""><br>
+      <label for="mode">작업 선택</label><br>
+      <input id="mode" type="text" name="mode" value="" placeholder="train, test, predict, update"><br>
 
-      <label for="rlmethod">RL_Method</label><br>
-      <input id="rlmethod" type="text" name="rl_method" value=""><br>
+      <label for="stock_name">종목명</label><br>
+      <input id="stock_name" type="text" name="s_name" value="" placeholder="주식 종목명을 입력하세요"><br>
 
-      <label for="net">Net</label><br>
-      <input id="net" type="text" name="network" value=""><br>
+      <label for="rlmethod">강화학습 알고리즘 선택</label><br>
+      <input id="rlmethod" type="text" name="rl_method" placeholder="dqn, pg, ac, a2c, a3c, monkey"><br>
 
-      <label for="s_date">Start Date</label><br>
+      <label for="net">딥러닝 알고리즘 선택</label><br>
+      <input id="net" type="text" name="network" placeholder="dnn, lstm, cnn, monkey"><br>
+
+      <label for="s_date">시작일</label><br>
       <input id="s_date" type="text" name="start_date" value=""><br>
 
-      <label for="e_date">End Date</label><br>
+      <label for="e_date">종료일</label><br>
       <input id="e_date" type="text" name="end_date" value=""><br>
       <input type="submit" value="SUBMIT">
     </form>

@@ -9,9 +9,9 @@ BASE_DIR = os.path.abspath(os.path.join(__file__, '../../..'))
 # connect db
 engine = create_engine(os.getenv("DATABASE_URL"))
 
-def getdata(logfile_name):
+def getdata(logfile):
     
-    log_path = os.path.abspath(os.path.join(BASE_DIR, 'output', logfile_name))
+    log_path = os.path.abspath(os.path.join(BASE_DIR, 'output', logfile))
 
     with open(log_path, 'r') as f:
         lines = f.readlines()
@@ -25,7 +25,7 @@ def getdata(logfile_name):
 
     # [005930] RL:a2c NET:lstm LR:0.0001 DF:0.9
     learner = lines[1]
-
+    print(learner)
     # [005930] Elapsed Time:17.3947 Max PV:149,374,384 #Win:10
     result = lines[-1]
     
@@ -38,8 +38,8 @@ def getdata(logfile_name):
     query = (f"SELECT stockname, stockcode, date, open, high, low, close, volume "
              f"FROM stocks "
              f"where stockcode={params['stock_code'][0]} AND "
-                f"date>={int(params['start_date'])} AND "
-                f"date<={int(params['end_date'])}")
+                f"date>={params['start_date']} AND "
+                f"date<={params['end_date']}")
     stock_df = pd.read_sql_query(con=engine.connect(), sql=sql_text(query))
     
     return stock_df, log_df, params, learner, result
