@@ -311,7 +311,8 @@ class ReinforcementLearner:
         
             logger.debug(f'{self.mode},{self.stock_code},{epoch_str},{epsilon:.4f},{self.exploration_cnt},'             # 수정
                          f'{self.agent.num_buy},{self.agent.num_sell},{self.agent.num_hold},'
-                         f'{self.agent.num_stocks},{self.agent.portfolio_value:.0f},{self.loss:.6f}'
+                         f'{self.agent.num_stocks},{self.agent.portfolio_value:.0f},{self.loss:.6f},'
+                         f'{self.rl_method},{self.net},'
                          f'{self.lr},{self.discount_factor},{self.start_date},{self.end_date}')
             # logger.debug(f'stock_code:{self.stock_code},epoch:{epoch_str},'
             #              f'epsilon:{epsilon:.4f},exploration_ratio:{self.exploration_cnt}/{self.itr_cnt},' 
@@ -375,9 +376,11 @@ class ReinforcementLearner:
             action, confidence, _ = self.agent.decide_action(pred_value, pred_policy, 0)
             result.append((self.environment.observation[0], int(action), float(confidence)))
 
+            # 수정
+            logger.debug(f'{self.mode},{self.stock_code},{self.environment.observation[0]},{int(action)},{float(confidence)}')
+        
         with open(os.path.join(self.output_path, f'pred_{self.stock_code}.json'), 'w') as f:
             print(json.dumps(result), file=f)
-        return result
 
 
 class DQNLearner(ReinforcementLearner):
