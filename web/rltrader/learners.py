@@ -28,7 +28,8 @@ class ReinforcementLearner:
                  discount_factor=0.9, num_epoches=1000,
                  balance=100000000, start_epsilon=1,
                  value_network=None, policy_network=None,
-                 output_path='', reuse_models=True):
+                 output_path='', reuse_models=True,
+                 mode='', start_date='', end_date=''):
         # 인자 확인
         assert min_trading_price > 0
         assert max_trading_price > 0
@@ -79,8 +80,10 @@ class ReinforcementLearner:
         self.batch_size = 0
         # 로그 등 출력 경로
         self.output_path = output_path
-        # 출력 결과 저장                      수정
-        # self.df = pd.DataFrame(columns=range(6))            # 수정
+        self.mode = mode                    # 수정
+        self.start_date = start_date        # 수정
+        self.end_date = end_date            # 수정
+        
 
     def init_value_network(self, shared_network=None, activation='linear', loss='mse'):
         if self.net == 'dnn':
@@ -193,17 +196,6 @@ class ReinforcementLearner:
             self.memory_policy = [np.array([np.nan] * len(Agent.ACTIONS))] \
                                  * (self.num_steps - 1) + self.memory_policy
         self.memory_pv = [self.agent.initial_balance] * (self.num_steps - 1) + self.memory_pv
-
-        ########### 수정
-        # df_new = pd.DataFrame(
-        #         zip(self.memory_action, self.memory_num_stocks, self.memory_pv, self.memory_policy, self.memory_value),
-        #         columns=['action', 'num_stocks', 'pv', 'policy', 'value'])
-        # df_new['stockcode'] = self.stock_code
-        # # df_new['epoch'] = epoch
-        # self.df.append(df_new, sort=False, ignore_index=True)
-        # print(self.df.head(10))
-        # self.df.to_csv(settings.BASE_DIR + '/log.csv', index=False)
-        ##########################
         
         self.visualizer.plot(
             epoch_str=epoch_str, num_epoches=num_epoches,
@@ -245,7 +237,7 @@ class ReinforcementLearner:
         max_portfolio_value = 0
         epoch_win_cnt = 0
         
-        logger.debug('stockcode,epochs,epsilon,num_exploration,num_buy,num_sell,num_hold,num_stocks,pv,loss,rl_method,net,lr,discount_factor')  # 수정
+        logger.debug('mode,stockcode,epochs,epsilon,num_exploration,num_buy,num_sell,num_hold,num_stocks,pv,loss,rl_method,net,lr,discount_factor,start_date,end_date')  # 수정
         
         # 에포크 반복
         for epoch in tqdm(range(self.num_epoches)):
@@ -317,10 +309,10 @@ class ReinforcementLearner:
             time_end_epoch = time.time()
             elapsed_time_epoch = time_end_epoch - time_start_epoch
         
-            logger.debug(f'{self.stock_code},{epoch_str},{epsilon:.4f},{self.exploration_cnt},'             # 수정
+            logger.debug(f'{self.mode},{self.stock_code},{epoch_str},{epsilon:.4f},{self.exploration_cnt},'             # 수정
                          f'{self.agent.num_buy},{self.agent.num_sell},{self.agent.num_hold},'
                          f'{self.agent.num_stocks},{self.agent.portfolio_value:.0f},{self.loss:.6f}'
-                         f'{self.lr},{self.discount_factor}')
+                         f'{self.lr},{self.discount_factor},{self.start_date},{self.end_date}')
             # logger.debug(f'stock_code:{self.stock_code},epoch:{epoch_str},'
             #              f'epsilon:{epsilon:.4f},exploration_ratio:{self.exploration_cnt}/{self.itr_cnt},' 
             #              f'num_buy:{self.agent.num_buy},num_sell:{self.agent.num_sell},num_hold:{self.agent.num_hold},'

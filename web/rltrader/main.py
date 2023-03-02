@@ -8,7 +8,7 @@ def rltrader(mode='train', ver='v3', name='test', stock_code_list=['005930'],
              rl_method='a2c', net='dnn', backend='pytorch',
              start_date=20200101, end_date=20201231, 
              lr=0.0001, discount_factor=0.9, balance=100_000_000):
-    print('main.py 시작')
+    print('--------------main.py 시작--------------------')
     output_name = f'{mode}_{name}_{rl_method}_{net}'
     learning = mode in ['train', 'update']
     reuse_models = mode in ['test', 'update', 'predict']
@@ -107,7 +107,10 @@ def rltrader(mode='train', ver='v3', name='test', stock_code_list=['005930'],
             'discount_factor': discount_factor,
             'start_epsilon': start_epsilon,
             'output_path': output_path,
-            'reuse_models': reuse_models
+            'reuse_models': reuse_models,
+            'mode':mode,
+            'start_date':start_date, 
+            'end_date':end_date,
         }
 
         # 강화학습 시작
