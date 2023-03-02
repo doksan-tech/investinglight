@@ -1,28 +1,23 @@
+"""Routes for parent Flask app."""
 import os
 import pandas as pd
+from flask import current_app as app
+from flask import render_template, request, redirect
 from sqlalchemy import create_engine, text as sql_text
-from flask import Flask, render_template, request
-import time
 
-app = Flask(__name__)
-engine = create_engine(os.getenv("DATABASE_URL"))
-#query = 'select * from marketfeatures;'
-#query2 = 'select * from stocks;'
-#df_market = pd.read_sql_query(con=engine.connect(), sql=sql_text(query))
-#df_stock = pd.read_sql_query(con=engine.connect(), sql=sql_text(query2))
-#market_col = list(df_market.columns)
-#stock_col = list(df_stock.columns)
-#all_col = market_col + stock_col
+BASE_DIR = os.path.abspath(os.path.join(__file__, '../..'))
 
-def reinforcement_learning_func():
-    time.sleep(2)
-
-@app.route('/')
-def hello():
+@app.route("/")
+def home():
+    """매개변수 입력 화면"""
     return render_template("main.html")
 
 @app.route('/register', methods=['post'])
 def register():
+    
+    main_path = os.path.abspath(os.path.join(BASE_DIR, 'rltrader/main.py'))
+    engine = create_engine(os.getenv("DATABASE_URL"))
+    
     name = request.form["name"]
     stock_name = request.form["s_name"]
     rl_method = request.form["rl_method"]
@@ -53,10 +48,6 @@ def register():
     if s_size == 0 or check == 0:
         return render_template("choose_again.html")
     else:
-        command = "python /home/skatlqwktjd/investinglight/rltrader/main.py --name "+name+" --stock_code "+var1+" --rl_method "+rl_method+" --net "+net+" --start_date "+var2+" --end_date "+var3
+        command = f"python {main_path} --name {name} --stock_code {var1} --rl_method {rl_method} --net {net} --start_date {var2} --end_date {var3}"
         os.system(command)
-        return render_template("result.html")
-
-
-if __name__ == '__main__':
-    app.run(port=8002)
+        return redirect('/learnchart')
