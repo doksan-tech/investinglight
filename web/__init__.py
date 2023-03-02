@@ -1,30 +1,65 @@
 """Initialize Flask app."""
+import os
 from flask import Flask
-# import config
+from flask.helpers import get_root_path
+from dash import Dash
 
 def create_app(dash_debug, dash_auto_reload):
     """application factory"""
-    app = Flask(__name__, instance_relative_config=True)
-    # app.config.from_object('config.Config')
+    server = Flask(__name__, instance_relative_config=True)
+    server.config.from_object('config.Config')
     
+    # register all dash apps and blueprint -------------------
     from web.views import main_views, train_dash, test_dash
-    app.register_blueprint(main_views.bp)
-    app = train_dash.init_dash(app)
-    app = test_dash.init_dash(app)
+    # register blueprint
+    server.register_blueprint(main_views.bp)
     
-    return app
+    # register train_dash
+    # server = train_dash.init_dash(server)
+    # server = test_dash.init_dash(server)
+    from .views.train_dash.layout import layout as train_dash_layout
+    from .views.train_dash.callbacks import register_callbacks as train_dash_callbacks
+    register_dash_app(
+        flask_server=server,
+        title='Train Result',
+        base_pathname='train',
+        layout=train_dash_layout,
+        register_callbacks_funcs=[train_dash_callbacks],
+        dash_debug=dash_debug,
+        dash_auto_reload=dash_auto_reload
+    )
+    
+    # register test_dash
+    # server = test_dash.init_dash(server)
+    
+    
+    # if running on gunicorn with multiple workers this message should print once for each worker if preload_app is set to False
+    print(f'Flask With Dash Apps Built Successfully with PID {str(os.getpid())}.')
+    
+    return server
 
-# def init_app():
-#     """Construct core Flask application."""
-#     app = Flask(__name__, instance_relative_config=False)
-#     app.config.from_object('config.Config')
 
-#     with app.app_context():
-#         # Import parts of our core Flask app
-#         from . import routes
+def register_dash_app(flask_server, title, base_pathname, 
+                      layout, register_callbacks_funcs, 
+                      dash_debug, dash_auto_reload):
+    # Meta tags for viewport responsiveness
+    meta_viewport = {"name": "viewport", 
+                     "content": "width=device-width, initial-scale=1, shrink-to-fit=no"}
 
-#         # Import Dash application
-#         from .dash import init_dash
-#         app = init_dash(app)
-        
-#         return app
+    my_dash_app = Dash(
+        __name__,
+        server=flask_server,
+        url_base_pathname=f'/{base_pathname}/',
+        assets_folder=get_root_path(__name__) + '/static/',
+        meta_tags=[meta_viewport],
+        # external_stylesheets=[],
+        # external_scripts=[]
+    )
+
+    with flask_server.app_context():
+        my_dash_app.title = title
+        my_dash_app.layout = layout
+        my_dash_app.css.config.serve_locally = True
+        my_dash_app.enable_dev_tools(debug=dash_debug, dev_tools_hot_reload=dash_auto_reload)
+        for call_back_func in register_callbacks_funcs:
+            call_back_func(my_dash_app)

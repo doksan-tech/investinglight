@@ -3,7 +3,8 @@
 import os
 from dotenv import load_dotenv  # pip install python-dotenv
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))  # project home
+# BASE_DIR = os.path.abspath(os.path.join(__file__, os.path.pardir))  # project home
+BASE_DIR = os.path.abspath(os.path.join(__file__))  # project home
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 class Config:
