@@ -15,7 +15,7 @@ def rltrader(mode='train', ver='v3', name='test', stock_code_list=['005930'],
     value_network_name = f'{name}_{rl_method}_{net}_value.mdl'
     policy_network_name = f'{name}_{rl_method}_{net}_policy.mdl'
     start_epsilon = 1 if mode in ['train', 'update'] else 0
-    num_epoches = 10 if mode in ['train', 'update'] else 1
+    num_epoches = 1000 if mode in ['train', 'update'] else 1
     num_steps = 5 if net in ['lstm', 'cnn'] else 1
 
     # Backend 설정
@@ -53,7 +53,7 @@ def rltrader(mode='train', ver='v3', name='test', stock_code_list=['005930'],
     # https://docs.python.org/ko/3.8/howto/logging.html
     # BASE_DIR/output/train_20230219_dqn_lstm/train_20230219_dqn_lstm.log
     # TODO: StreamHandler - FileHandler 차이
-    log_name = f'{mode}_{name}_{stock_code_list[0]}_{rl_method}_{net}'
+    log_name = f'{mode}_{name}_{stock_code_list[0]}_{rl_method}_{net}.log'
     log_path = os.path.join(settings.BASE_DIR, 'output', log_name)  # 수정
     if os.path.exists(log_path):
         os.remove(log_path)

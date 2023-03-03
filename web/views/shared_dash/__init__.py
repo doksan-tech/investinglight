@@ -1,21 +1,4 @@
-# import dash_html_components as html, dcc
-# import dash_bootstrap_components as dbc
-
-
-# def shared_dash_nav() -> html.Div:
-#     link_style = {'marginLeft': '10px'}
-#     links = html.Div
-#     (
-#         id='shared-dash-nav',
-#         # style={'display': 'flex', 'flexWrap': 'wrap', 'marginTop': '15px', 'marginBottom': '15px', 'backgroundColor': 'lightBlue'},
-#         html.Div
-#         (
-#             class_name="navbar navbar-expand-lg navbar-light bg-light border-bottom",
-                 
-#         )
-#     )
-#     return links
-
+"""navbar """
 from dash import html
 
 def shared_dash_nav() -> html.Div:
@@ -23,14 +6,14 @@ def shared_dash_nav() -> html.Div:
     links = html.Div(
         id='shared-navigation-links',
         # style={'display': 'flex', 'flexWrap': 'wrap', 'marginTop': '15px', 'marginBottom': '15px', 'backgroundColor': 'lightBlue'},
-        className="navbar navbar-expand-lg navbar-light bg-light border-bottom",
+        className="navbar navbar-expand-lg navbar-light bg-light border-bottom mb-3",
         children=[
             html.Div(
                 className="container-fluid",
                 children=[
                     html.A(
                         href='/',
-                        children='투자 신호등',
+                        children=html.H4('투자 신호등'),
                         className="navbar-brand"
                     ),
                     html.Div(

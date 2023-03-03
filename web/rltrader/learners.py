@@ -83,6 +83,7 @@ class ReinforcementLearner:
         self.mode = mode                    # 수정
         self.start_date = start_date        # 수정
         self.end_date = end_date            # 수정
+        self.init_balance = balance
         
 
     def init_value_network(self, shared_network=None, activation='linear', loss='mse'):
@@ -237,7 +238,7 @@ class ReinforcementLearner:
         max_portfolio_value = 0
         epoch_win_cnt = 0
         
-        logger.debug('mode,stockcode,epochs,epsilon,num_exploration,num_buy,num_sell,num_hold,num_stocks,pv,loss,rl_method,net,lr,discount_factor,start_date,end_date')  # 수정
+        logger.debug('mode,stockcode,epochs,epsilon,num_exploration,num_buy,num_sell,num_hold,num_stocks,pv,loss,rl_method,net,lr,discount_factor,start_date,end_date','init_balance')  # 수정
         
         # 에포크 반복
         for epoch in tqdm(range(self.num_epoches)):
@@ -313,7 +314,7 @@ class ReinforcementLearner:
                          f'{self.agent.num_buy},{self.agent.num_sell},{self.agent.num_hold},'
                          f'{self.agent.num_stocks},{self.agent.portfolio_value:.0f},{self.loss:.6f},'
                          f'{self.rl_method},{self.net},'
-                         f'{self.lr},{self.discount_factor},{self.start_date},{self.end_date}')
+                         f'{self.lr},{self.discount_factor},{self.start_date},{self.end_date},{self.init_balance}')
             # logger.debug(f'stock_code:{self.stock_code},epoch:{epoch_str},'
             #              f'epsilon:{epsilon:.4f},exploration_ratio:{self.exploration_cnt}/{self.itr_cnt},' 
             #              f'num_buy:{self.agent.num_buy},num_sell:{self.agent.num_sell},num_hold:{self.agent.num_hold},'
@@ -352,6 +353,8 @@ class ReinforcementLearner:
         # step 샘플을 만들기 위한 큐
         q_sample = collections.deque(maxlen=self.num_steps)
 
+        logger.debug('mode,stockcode,date,action,action_value')
+        
         result = []
         while True:
             # 샘플 생성
