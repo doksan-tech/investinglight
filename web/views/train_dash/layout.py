@@ -33,20 +33,20 @@ def layout():
         font={'size':10},
     )
     
-    # pie chart
-    df_trading = log_df.loc[:, ['num_buy', 'num_sell', 'num_hold']]
-    df_trading = df_trading.astype('int')
-    labels = ['매수', '매도', '관망']
-    values = [df_trading['num_buy'].mean(), df_trading['num_sell'].mean(), df_trading['num_hold'].mean()]
-    pie_chart = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent', hole=.3)])
-    pie_chart.update_layout(
-        showlegend=False,
-        annotations=[dict(text='매매', x=0.5, y=0.5, font_size=15, showarrow=False)],
-        font={'size':13},
-        height=300,
-        margin_autoexpand=False,
-        margin=dict(t=20, b=20, l=10, r=10)
-    )
+    # # pie chart
+    # df_trading = log_df.loc[:, ['num_buy', 'num_sell', 'num_hold']]
+    # df_trading = df_trading.astype('int')
+    # labels = ['매수', '매도', '관망']
+    # values = [df_trading['num_buy'].mean(), df_trading['num_sell'].mean(), df_trading['num_hold'].mean()]
+    # pie_chart = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent', hole=.3)])
+    # pie_chart.update_layout(
+    #     showlegend=False,
+    #     annotations=[dict(text='매매', x=0.5, y=0.5, font_size=15, showarrow=False)],
+    #     font={'size':13},
+    #     height=300,
+    #     margin_autoexpand=False,
+    #     margin=dict(t=20, b=20, l=10, r=10)
+    # )
     
     init_balance = 100_000_000    # TODO: 인자로 받아서 처리
     # PV chart
@@ -142,7 +142,7 @@ def layout():
                             children=[
                             dbc.CardBody([
                                 html.H5('평균 매매 비율', className='text-center text-info'),
-                                dcc.Graph(id='pie_chart', figure=pie_chart),
+                                dcc.Graph(id='pie_chart', figure={}),
                                 # html.P('에포크를 반복하며 에이전트가 매수, 매도, 관망한 행동을 평균내어 비율화', 
                                 #     className='card-text mb-5'),
                             ]),

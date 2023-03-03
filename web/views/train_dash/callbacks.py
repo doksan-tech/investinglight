@@ -1,5 +1,5 @@
 import pandas as pd
-from dash import html, dcc
+from dash import html, dcc, Input, Output
 import plotly.express as px
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
@@ -8,33 +8,34 @@ from web.views.getdata import get_data, get_stock_price, get_unique_items
 
 
 def register_callbacks(dash_app):
-    pass
-    # log_df = get_data('train')
-    # stock_code_list = get_unique_items(log_df, 'stockcode')
+    
+    log_df = get_data('train')
+    stock_code_list = get_unique_items(log_df, 'stockcode')
     # rl_list = get_unique_items(log_df, 'rl_method')
     # net_list = get_unique_items(log_df, 'net')
     
-    # @dash_app.callback(
-    #     Output(component_id='pie_chart', component_property='figure'),
-    #     [Input(component_id='choose_rl_method', component_property='value'),
-    #      Input(component_id='choose_net', component_property='value')]
-    # )
-    # def update_pie(rl_method, net):
-    #     df_trading = log_df.loc[:, ['num_buy', 'num_sell', 'num_hold']]
-    #     df_trading = df_trading.astype('int')
-    #     labels = ['매수', '매도', '관망']
-    #     values = [df_trading['num_buy'].mean(), df_trading['num_sell'].mean(), df_trading['num_hold'].mean()]
-    #     pie_chart = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent', hole=.3)])
-    #     pie_chart.update_layout(
-    #         showlegend=False,
-    #         annotations=[dict(text='매매', x=0.5, y=0.5, font_size=15, showarrow=False)],
-    #         font={'size':13},
-    #         height=300,
-    #         margin_autoexpand=False,
-    #         margin=dict(t=20, b=20, l=10, r=10)
-    #     )
+    @dash_app.callback(
+        Output(component_id='pie_chart', component_property='figure'),
+        [Input(component_id='choose_rl_method', component_property='value'),
+         Input(component_id='choose_net', component_property='value')]
+    )
+    def update_pie(rl_method, net):
+        df_trading = log_df[(log_df['rl_method'] == rl_method) & (log_df['rl_method'] == net)], 
+        df_trading = df_trading.loc[:, ['num_buy', 'num_sell', 'num_hold']]
+        df_trading = df_trading.astype('int')
+        labels = ['매수', '매도', '관망']
+        values = [df_trading['num_buy'].mean(), df_trading['num_sell'].mean(), df_trading['num_hold'].mean()]
+        pie_chart = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent', hole=.3)])
+        pie_chart.update_layout(
+            showlegend=False,
+            annotations=[dict(text='매매', x=0.5, y=0.5, font_size=15, showarrow=False)],
+            font={'size':13},
+            height=300,
+            margin_autoexpand=False,
+            margin=dict(t=20, b=20, l=10, r=10)
+        )
     
-    #     return pie_chart
+        return pie_chart
 
 
 
