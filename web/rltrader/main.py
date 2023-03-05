@@ -9,7 +9,7 @@ def rltrader(mode='train', ver='v3', name='test', stock_code_list=['005930'],
              start_date=20200101, end_date=20201231, 
              lr=0.0001, discount_factor=0.9, balance=100_000_000):
     print('--------------main.py 시작--------------------')
-    output_name = f'{mode}_{name}_{rl_method}_{net}'
+    output_name = f'{mode}_{stock_code_list[0]}_{rl_method}_{net}'
     learning = mode in ['train', 'update']
     reuse_models = mode in ['test', 'update', 'predict']
     value_network_name = f'{name}_{rl_method}_{net}_value.mdl'
@@ -19,11 +19,11 @@ def rltrader(mode='train', ver='v3', name='test', stock_code_list=['005930'],
     num_steps = 5 if net in ['lstm', 'cnn'] else 1
 
     # Backend 설정
-    os.environ['RLTRADER_BACKEND'] = backend
-    if backend == 'tensorflow':
-        os.environ['KERAS_BACKEND'] = 'tensorflow'
-    elif backend == 'plaidml':
-        os.environ['KERAS_BACKEND'] = 'plaidml.keras.backend'
+    # os.environ['RLTRADER_BACKEND'] = backend
+    # if backend == 'tensorflow':
+    #     os.environ['KERAS_BACKEND'] = 'tensorflow'
+    # elif backend == 'plaidml':
+    #     os.environ['KERAS_BACKEND'] = 'plaidml.keras.backend'
 
     # 출력 경로 생성 -> eg. BASE_DIR/output/train_20230219_dqn_lstm/
     # os.makedirs() -> 끝에 s가 붙는 것 주의!! 일치하는 디렉토리가 없어도 생성
@@ -52,12 +52,12 @@ def rltrader(mode='train', ver='v3', name='test', stock_code_list=['005930'],
     # 로그 레벨: DEBUG < INFO < WARNING < ERROR < CRITICAL
     # https://docs.python.org/ko/3.8/howto/logging.html
     # BASE_DIR/output/train_20230219_dqn_lstm/train_20230219_dqn_lstm.log
-    # TODO: StreamHandler - FileHandler 차이
-    log_name = f'{mode}_{name}_{stock_code_list[0]}_{rl_method}_{net}.log'
-    log_path = os.path.join(settings.BASE_DIR, 'output', log_name)  # 수정
+    log_path = os.path.join(output_path, f'{output_name}.log')
     if os.path.exists(log_path):
         os.remove(log_path)
-    logging.basicConfig(format='%(message)s', filemode='w')  # 화면에 출력할 내용
+    elif not os.path.dirname(log_path):
+        os.makedirs(os.path.dirname(log_path))
+    logging.basicConfig(format='%(message)s')  # 출력 내용
     logger = logging.getLogger(settings.LOGGER_NAME)  # logger 생성
     logger.setLevel(logging.DEBUG)  # 상세한 정보. 보통 문제를 진단할 때만 필요
     logger.propagate = False  # TODO: 모르겠음
@@ -67,7 +67,8 @@ def rltrader(mode='train', ver='v3', name='test', stock_code_list=['005930'],
     file_handler.setLevel(logging.DEBUG)
     logger.addHandler(stream_handler)
     logger.addHandler(file_handler)
-    # logger.info(params)  # 파라미터 로그 파일에 기록
+    logger.info(params)  # prams 변수 로그에 기록
+
 
     # Backend 설정, 로그 설정을 먼저하고 RLTrader 모듈들을 이후에 임포트해야 함
     from .learners import ReinforcementLearner, DQNLearner, \

@@ -42,3 +42,4 @@ class Environment:
         if self.observation is not None:
             return self.observation[self.PRICE_IDX]
         return None
+

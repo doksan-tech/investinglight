@@ -3,24 +3,35 @@
 <div class="container mt-3">
   <form action="/register" method="post">
     <div class="mb-0">
-      <label class="form-label" for="lname">작업 이름</label><br>
-      <input id="lname" type="text" name="name" class="form-control" placeholder="파일명으로 사용되니 영어로 입력하세요."><br>
-    </div>
-    <div class="mb-0">
       <label class="form-label" for="mode">작업 선택</label><br>
-      <input id="mode" type="text" name="mode" class="form-control" placeholder="train, test, predict, update 중 하나를 입력하세요."><br>
+      <select class="form-select mb-4" name="mode" id="mode">
+        <option value="train">train</option>
+        <option value="test">test</option>
+        <option value="predict">predict</option>
+        <option value="update">update</option>
+      </select>
     </div>
     <div class="mb-0">
       <label class="form-label" for="stock_name">종목명</label><br>
-      <input id="stock_name" type="text" name="s_name" class="form-control" placeholder="주식 종목명을 입력하세요."><br>
+      <input id="stock_name" type="text" name="s_name" class="form-control" placeholder="005930"><br>
     </div>
     <div class="mb-0">
-      <label class="form-label" for="rlmethod">강화학습 알고리즘 선택</label><br>
-      <input id="rlmethod" type="text" name="rl_method" class="form-control" placeholder="dqn, pg, ac, a2c, a3c 중 하나를 입력하세요."><br>
+      <label class="form-label" for="rl_method">강화학습 알고리즘 선택</label><br>
+      <select class="form-select mb-4" name="rl_method" id="rl_method">
+        <option value="dqn">Deep Q-Learning</option>
+        <option value="pg">Policy Gradients</option>
+        <option value="ac">Actor Critic</option>
+        <option value="a2c">Advantage Actor Critic(A2C)</option>
+        <option value="a3c">Asynchronous Actor Critic(A3C)</option>
+      </select>
     </div>
     <div class="mb-0">
       <label class="form-label" for="net">딥러닝 알고리즘 선택</label><br>
-      <input id="net" type="text" name="network" class="form-control" placeholder="dnn, lstm, cnn 중 하나를 입력하세요."><br>
+      <select class="form-select mb-4" name="network" id="net">
+        <option value="dnn">Deep Neural Networks(DNN)</option>
+        <option value="cnn">Convolutional Neural Networks(CNN)</option>
+        <option value="lstm">Long Short-Term Memory(LSTM)</option>
+      </select>
     </div>
     <div class="row justify-content-evenly">
       <div class="col">

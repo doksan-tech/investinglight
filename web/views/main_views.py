@@ -8,10 +8,6 @@ from web.rltrader.main import rltrader
 
 bp = Blueprint('main', __name__, url_prefix='/')
 
-@bp.route('/hello')
-def hello():
-    return 'Hello bp'
-
 @bp.route('/')
 def home():
     """매개변수 입력 화면"""
@@ -24,10 +20,9 @@ def register():
     elif request.method == 'POST':
         stock_code = ['005930']     # TODO: 수정
         engine = create_engine(environ.get("DATABASE_URL"))
-        
-        name = request.form["name"]
+
         mode = request.form["mode"]
-        stock_name = request.form["s_name"]
+        stock_name = request.form["s_name"]    # TODO: 종목명을 입력하면 코드로 변환하는 코드 추가
         rl_method = request.form["rl_method"]
         net = request.form["network"]
         start_date = str(request.form["start_date"]).replace('-', '')
@@ -54,7 +49,7 @@ def register():
         # if s_size == 0 or check == 0:
         #     return render_template("choose_again.html")
         # else:
-        rltrader(name=name, mode=mode, stock_code_list=stock_code,
+        rltrader(mode=mode, stock_code_list=stock_code,
                 rl_method=rl_method,  net=net,
                 start_date=start_date, end_date=end_date,
                 )

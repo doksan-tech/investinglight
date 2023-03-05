@@ -287,15 +287,15 @@ def load_data_v3_v4(code, date_from, date_to, ver):
         thousands=',', header=0, converters={'date': lambda x: str(x)})
     
     # 종목 데이터
-    df_stockfeatures = pd.read_csv(
-                os.path.join(settings.BASE_DIR, 'data', ver, '005930.csv'),
-                thousands=',', header=0, converters={'date': lambda x: str(x)})
-    # for filename in os.listdir(os.path.join(settings.BASE_DIR, 'data', ver)):
-    #     if filename.startswith(code):
-    #         df_stockfeatures = pd.read_csv(
-    #             os.path.join(settings.BASE_DIR, 'data', ver, filename),
+    # df_stockfeatures = pd.read_csv(
+    #             os.path.join(settings.BASE_DIR, 'data', ver, '005930_삼성전자.csv'),
     #             thousands=',', header=0, converters={'date': lambda x: str(x)})
-    #         break
+    for filename in os.listdir(os.path.join(settings.BASE_DIR, 'data', ver)):
+        if filename.startswith(code):
+            df_stockfeatures = pd.read_csv(
+                os.path.join(settings.BASE_DIR, 'data', ver, filename),
+                thousands=',', header=0, converters={'date': lambda x: str(x)})
+            break
 
     # print(df_marketfeatures.head(2))
     # print(df_stockfeatures.head(2))

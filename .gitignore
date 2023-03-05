@@ -4,3 +4,4 @@ data
 output
 models
 .env
+.DS_Store

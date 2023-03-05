@@ -6,13 +6,14 @@ import threading
 import time
 import json
 import numpy as np
+import pandas as pd
 from tqdm import tqdm
 from .environment import Environment
 from .agent import Agent
 from .networks import Network, DNN, LSTMNetwork, CNN
 from .visualizer import Visualizer
 from . import utils, settings
-# import pandas as pd              ################# 수정
+
 
 logger = logging.getLogger(settings.LOGGER_NAME)
 
@@ -84,7 +85,9 @@ class ReinforcementLearner:
         self.start_date = start_date        # 수정
         self.end_date = end_date            # 수정
         self.init_balance = balance
-        
+        self.t_df = pd.DataFrame()
+        self.predict_df = pd.DataFrame()
+
 
     def init_value_network(self, shared_network=None, activation='linear', loss='mse'):
         if self.net == 'dnn':
@@ -212,12 +215,12 @@ class ReinforcementLearner:
         self.visualizer.save(os.path.join(self.epoch_summary_dir, f'epoch_summary_{epoch_str}.png'))
 
     def run(self, learning=True):
-        info = (          # 수정
+        info = (
             f'[{self.stock_code}] RL:{self.rl_method} NET:{self.net} '
             f'LR:{self.lr} DF:{self.discount_factor} '
         )
-        # with self.lock:
-        #     logger.debug(info)
+        with self.lock:
+            logger.debug(info)
 
         # 시작 시간
         time_start = time.time()
@@ -237,9 +240,7 @@ class ReinforcementLearner:
         # 학습에 대한 정보 초기화
         max_portfolio_value = 0
         epoch_win_cnt = 0
-        
-        logger.debug('mode,stockcode,epochs,epsilon,num_exploration,num_buy,num_sell,num_hold,num_stocks,pv,loss,rl_method,net,lr,discount_factor,start_date,end_date','init_balance')  # 수정
-        
+
         # 에포크 반복
         for epoch in tqdm(range(self.num_epoches)):
             time_start_epoch = time.time()
@@ -309,17 +310,24 @@ class ReinforcementLearner:
             epoch_str = str(epoch + 1).rjust(num_epoches_digit, '0')
             time_end_epoch = time.time()
             elapsed_time_epoch = time_end_epoch - time_start_epoch
-        
-            logger.debug(f'{self.mode},{self.stock_code},{epoch_str},{epsilon:.4f},{self.exploration_cnt},'             # 수정
-                         f'{self.agent.num_buy},{self.agent.num_sell},{self.agent.num_hold},'
-                         f'{self.agent.num_stocks},{self.agent.portfolio_value:.0f},{self.loss:.6f},'
-                         f'{self.rl_method},{self.net},'
-                         f'{self.lr},{self.discount_factor},{self.start_date},{self.end_date},{self.init_balance}')
-            # logger.debug(f'stock_code:{self.stock_code},epoch:{epoch_str},'
-            #              f'epsilon:{epsilon:.4f},exploration_ratio:{self.exploration_cnt}/{self.itr_cnt},' 
-            #              f'num_buy:{self.agent.num_buy},num_sell:{self.agent.num_sell},num_hold:{self.agent.num_hold},'
-            #              f'num_stocks:{self.agent.num_stocks},pv:{self.agent.portfolio_value:,.0f},'
-            #              f'loss:{self.loss:.6f}')
+
+            info_learning = [[self.mode,self.stock_code,int(epoch_str),epsilon,self.exploration_cnt,             # 2차원 리스트로 정의해야 행으로 데이터가 입력됨.
+                         self.agent.num_buy,self.agent.num_sell,self.agent.num_hold,
+                         self.agent.num_stocks,self.agent.portfolio_value,self.loss,
+                         self.rl_method,self.net,
+                         self.lr,self.discount_factor,self.start_date,self.end_date,self.init_balance]]
+            columns = ['mode', 'stock_code', 'epochs', 'epsilon', 'num_exploration', 'num_buy', 'num_sell', 'num_hold',
+                       'num_stocks', 'pv', 'loss', 'rl_method', 'net', 'lr', 'discount_factor', 'start_date',
+                       'end_date',
+                       'init_balance']
+            temp_df = pd.DataFrame(info_learning, columns=columns)
+            self.t_df = pd.concat([self.t_df, temp_df], ignore_index=True)
+
+            logger.debug(f'stock_code:{self.stock_code},epoch:{epoch_str},'
+                         f'epsilon:{epsilon:.4f},exploration_ratio:{self.exploration_cnt}/{self.itr_cnt},' 
+                         f'num_buy:{self.agent.num_buy},num_sell:{self.agent.num_sell},num_hold:{self.agent.num_hold},'
+                         f'num_stocks:{self.agent.num_stocks},pv:{self.agent.portfolio_value:,.0f},'
+                         f'loss:{self.loss:.6f}')
 
             # 에포크 관련 정보 가시화
             if self.num_epoches == 1 or (epoch + 1) % int(self.num_epoches / 10) == 0:
@@ -335,10 +343,20 @@ class ReinforcementLearner:
         time_end = time.time()
         elapsed_time = time_end - time_start
 
+        # 학습 관련 정보 csv로 저장
+        try:
+            t_df_file_name = f'{self.mode}_{self.stock_code}_{self.rl_method}_{self.net}.csv'
+            t_df_file_name = os.path.join(settings.BASE_DIR, 'data', 'output', t_df_file_name)
+            if not os.path.isdir(t_df_file_name):
+                os.makedirs(os.path.dirname(t_df_file_name))
+            self.t_df.to_csv(t_df_file_name, index=False)
+        except OSError:
+            print('Error: Failed to save predict')
+
         # 학습 관련 정보 로그 기록
-        # with self.lock:           # 수정
-        #     logger.debug(f'[{self.stock_code}] Elapsed Time:{elapsed_time:.4f} '
-        #                  f'Max PV:{max_portfolio_value:,.0f} #Win:{epoch_win_cnt}')
+        with self.lock:           # 수정
+            logger.debug(f'[{self.stock_code}] Elapsed Time:{elapsed_time:.4f} '
+                         f'Max PV:{max_portfolio_value:,.0f} #Win:{epoch_win_cnt}')
 
     def save_models(self):
         if self.value_network is not None and self.value_network_path is not None:
@@ -352,8 +370,6 @@ class ReinforcementLearner:
 
         # step 샘플을 만들기 위한 큐
         q_sample = collections.deque(maxlen=self.num_steps)
-
-        logger.debug('mode,stockcode,date,action,action_value')
         
         result = []
         while True:
@@ -381,7 +397,20 @@ class ReinforcementLearner:
 
             # 수정
             logger.debug(f'{self.mode},{self.stock_code},{self.environment.observation[0]},{int(action)},{float(confidence)}')
-        
+
+            info_pred = [[self.mode,self.stock_code,self.environment.observation[0],int(action),float(confidence)]]
+            temp_pred_df = pd.DataFrame(info_pred, columns=['mode','stock_code','price','action','best'])
+            self.predict_df = pd.concat([self.predict_df, temp_pred_df], ignore_index=True)
+
+        try:
+            predict_file_name = f'{self.mode}_{self.stock_code}_{self.rl_method}_{self.net}.csv'
+            predict_file_name = os.path.join(settings.BASE_DIR, 'data', 'output', predict_file_name)
+            if not os.path.isdir(predict_file_name):
+                os.makedirs(os.path.dirname(predict_file_name))
+            self.predict_df.to_csv(predict_file_name, index=False)
+        except OSError:
+            print('Error: Failed to save predict')
+
         with open(os.path.join(self.output_path, f'pred_{self.stock_code}.json'), 'w') as f:
             print(json.dumps(result), file=f)
 
