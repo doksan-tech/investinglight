@@ -347,11 +347,11 @@ class ReinforcementLearner:
         try:
             t_df_file_name = f'{self.mode}_{self.stock_code}_{self.rl_method}_{self.net}.csv'
             t_df_file_name = os.path.join(settings.BASE_DIR, 'data', 'output', t_df_file_name)
-            if not os.path.isdir(t_df_file_name):
+            if not os.path.isdir(os.path.join(settings.BASE_DIR, 'data', 'output')):
                 os.makedirs(os.path.dirname(t_df_file_name))
             self.t_df.to_csv(t_df_file_name, index=False)
-        except OSError:
-            print('Error: Failed to save predict')
+        except Exception as e:
+            print(e)
 
         # 학습 관련 정보 로그 기록
         with self.lock:           # 수정
@@ -359,10 +359,16 @@ class ReinforcementLearner:
                          f'Max PV:{max_portfolio_value:,.0f} #Win:{epoch_win_cnt}')
 
     def save_models(self):
-        if self.value_network is not None and self.value_network_path is not None:
-            self.value_network.save_model(self.value_network_path)
-        if self.policy_network is not None and self.policy_network_path is not None:
-            self.policy_network.save_model(self.policy_network_path)
+        try:
+            models_path = os.path.join(settings.BASE_DIR, 'models')
+            if not os.path.isdir(models_path):
+                os.makedirs(models_path)
+            if self.value_network is not None and self.value_network_path is not None:
+                self.value_network.save_model(self.value_network_path)
+            if self.policy_network is not None and self.policy_network_path is not None:
+                self.policy_network.save_model(self.policy_network_path)
+        except Exception as e:
+            print(e)
 
     def predict(self):
         # 에이전트 초기화
@@ -405,11 +411,11 @@ class ReinforcementLearner:
         try:
             predict_file_name = f'{self.mode}_{self.stock_code}_{self.rl_method}_{self.net}.csv'
             predict_file_name = os.path.join(settings.BASE_DIR, 'data', 'output', predict_file_name)
-            if not os.path.isdir(predict_file_name):
+            if not os.path.isdir(os.path.join(settings.BASE_DIR, 'data', 'output')):
                 os.makedirs(os.path.dirname(predict_file_name))
             self.predict_df.to_csv(predict_file_name, index=False)
-        except OSError:
-            print('Error: Failed to save predict')
+        except Exception as e:
+            print(e)
 
         with open(os.path.join(self.output_path, f'pred_{self.stock_code}.json'), 'w') as f:
             print(json.dumps(result), file=f)

@@ -4,7 +4,7 @@ import requests
 from . import utils, settings, data_manager
 
 
-def rltrader(mode='train', ver='v3', name='test', stock_code_list=['005930'], 
+def rltrader(mode='train', ver='v3', name='', stock_code_list=['005930'],
              rl_method='a2c', net='dnn', backend='pytorch',
              start_date=20200101, end_date=20201231, 
              lr=0.0001, discount_factor=0.9, balance=100_000_000):
@@ -12,8 +12,8 @@ def rltrader(mode='train', ver='v3', name='test', stock_code_list=['005930'],
     output_name = f'{mode}_{stock_code_list[0]}_{rl_method}_{net}'
     learning = mode in ['train', 'update']
     reuse_models = mode in ['test', 'update', 'predict']
-    value_network_name = f'{name}_{rl_method}_{net}_value.mdl'
-    policy_network_name = f'{name}_{rl_method}_{net}_policy.mdl'
+    value_network_name = f'{mode}_{stock_code_list[0]}_{rl_method}_{net}_value.mdl'
+    policy_network_name = f'{mode}__{stock_code_list[0]}_{rl_method}_{net}_policy.mdl'
     start_epsilon = 1 if mode in ['train', 'update'] else 0
     num_epoches = 1000 if mode in ['train', 'update'] else 1
     num_steps = 5 if net in ['lstm', 'cnn'] else 1
@@ -55,7 +55,7 @@ def rltrader(mode='train', ver='v3', name='test', stock_code_list=['005930'],
     log_path = os.path.join(output_path, f'{output_name}.log')
     if os.path.exists(log_path):
         os.remove(log_path)
-    elif not os.path.dirname(log_path):
+    elif not os.path.dirname(os.path.join(settings.BASE_DIR, 'output')):
         os.makedirs(os.path.dirname(log_path))
     logging.basicConfig(format='%(message)s')  # 출력 내용
     logger = logging.getLogger(settings.LOGGER_NAME)  # logger 생성
