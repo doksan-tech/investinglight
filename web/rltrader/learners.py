@@ -349,7 +349,7 @@ class ReinforcementLearner:
             t_df_file_name = os.path.join(settings.BASE_DIR, 'data', 'output', t_df_file_name)
             if not os.path.isdir(os.path.join(settings.BASE_DIR, 'data', 'output')):
                 os.makedirs(os.path.dirname(t_df_file_name))
-            self.t_df.to_csv(t_df_file_name, index=False)
+            self.t_df.to_csv(t_df_file_name, index=False, mode='a', header=False)
         except Exception as e:
             print(e)
 
@@ -413,7 +413,7 @@ class ReinforcementLearner:
             predict_file_name = os.path.join(settings.BASE_DIR, 'data', 'output', predict_file_name)
             if not os.path.isdir(os.path.join(settings.BASE_DIR, 'data', 'output')):
                 os.makedirs(os.path.dirname(predict_file_name))
-            self.predict_df.to_csv(predict_file_name, index=False)
+            self.predict_df.to_csv(predict_file_name, index=False, mode='a', header=False)
         except Exception as e:
             print(e)
 
