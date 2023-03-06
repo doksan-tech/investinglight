@@ -53,4 +53,4 @@ def register():
                 rl_method=rl_method,  net=net,
                 start_date=start_date, end_date=end_date,
                 )
-        return 'Training Done'
+        return render_template("result.html")

@@ -20,10 +20,3 @@ class Config:
     STATIC_FOLDER = "static"
     TEMPLATES_FOLDER = "templates"
 
-# class Config:
-#     """Flask configuration variables."""
-
-#     # General Config
-#     APP_NAME = os.environ.get("APP_NAME")
-#     DEBUG = os.environ.get("FLASK_DEBUG")
-    
