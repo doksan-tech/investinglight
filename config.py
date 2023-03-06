@@ -1,18 +1,22 @@
-"""Flask config."""
-from os import environ, path
+# keep this file and other files used by the create_app function free of inner-project import statements to help
+# prevent circular imports.  Setting up cache in a separate cache.py file similar to this config.py file is very helpful.
+import os
 from dotenv import load_dotenv  # pip install python-dotenv
 
-BASE_DIR = path.abspath(path.dirname(__file__))
-load_dotenv(path.join(BASE_DIR, ".env"))
+# BASE_DIR = os.path.abspath(os.path.join(__file__, os.path.pardir))  # project home
+BASE_DIR = os.path.abspath(os.path.join(__file__))  # project home
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 class Config:
-    """Flask configuration variables."""
+    # user configurations
+    flask_debug = True
+    dash_debug = False
+    dash_auto_reload = False
 
-    # General Config
-    FLASK_APP = "wsgi.py"
-    FLASK_ENV = environ.get("FLASK_DEBUG")
-    
+    # flask configurations
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+
     # Static Assets
     STATIC_FOLDER = "static"
     TEMPLATES_FOLDER = "templates"
-    COMPRESSOR_DEBUG = environ.get("COMPRESSOR_DEBUG")
+
