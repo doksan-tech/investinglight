@@ -1,8 +1,8 @@
 import os
 import pandas as pd
 import numpy as np
+from sqlalchemy import create_engine, text as sql_text
 
-from . import settings
 
 COLUMNS_CHART_DATA = ['date', 'open', 'high', 'low', 'close', 'volume']
 
@@ -232,84 +232,37 @@ def preprocess(data, ver='v1'):
     return data
 
 
-def load_data(code, date_from, date_to, ver='v2'):
-    if ver in ['v3', 'v4']:
-        return load_data_v3_v4(code, date_from, date_to, ver)
+def load_data(code, date_from, date_to, ver):
+    """일정 기간 동안의 종목 데이터를 db에서 가져와 chart_data, training_data로 반환"""
 
-    header = None if ver == 'v1' else 0
-    df = pd.read_csv(
-        os.path.join(settings.BASE_DIR, '../data', ver, f'{code}.csv'),
-        thousands=',', header=header, converters={'date': lambda x: str(x)})
-
-    if ver == 'v1':
-        df.columns = ['date', 'open', 'high', 'low', 'close', 'volume']
-
-    # 날짜 오름차순 정렬
-    df = df.sort_values(by='date').reset_index(drop=True)
-
-    # 데이터 전처리
-    df = preprocess(df)
-
-    # 기간 필터링
-    df['date'] = df['date'].str.replace('-', '')
-    df = df[(df['date'] >= date_from) & (df['date'] <= date_to)]
-    df = df.fillna(method='ffill').reset_index(drop=True)
-
-    # 차트 데이터 분리
-    chart_data = df[COLUMNS_CHART_DATA]
-
-    # 학습 데이터 분리
-    training_data = None
-    if ver == 'v1':
-        training_data = df[COLUMNS_TRAINING_DATA_V1]
-    elif ver == 'v1.1':
-        training_data = df[COLUMNS_TRAINING_DATA_V1_1]
-    elif ver == 'v2':
-        df.loc[:, ['per', 'pbr', 'roe']] = df[['per', 'pbr', 'roe']].apply(lambda x: x / 100)
-        training_data = df[COLUMNS_TRAINING_DATA_V2]
-        training_data = training_data.apply(np.tanh)
-    else:
-        raise Exception('Invalid version.')
-
-    return chart_data, training_data
-
-
-def load_data_v3_v4(code, date_from, date_to, ver):
     columns = None
     if ver == 'v3':
         columns = COLUMNS_TRAINING_DATA_V3
     elif ver == 'v4':
         columns = COLUMNS_TRAINING_DATA_V4
 
-    # 시장 데이터
-    df_marketfeatures = pd.read_csv(
-        os.path.join(settings.BASE_DIR, 'data', ver, 'marketfeatures.csv'),
-        thousands=',', header=0, converters={'date': lambda x: str(x)})
-    
-    # 종목 데이터
-    # df_stockfeatures = pd.read_csv(
-    #             os.path.join(settings.BASE_DIR, 'data', ver, '005930_삼성전자.csv'),
-    #             thousands=',', header=0, converters={'date': lambda x: str(x)})
-    for filename in os.listdir(os.path.join(settings.BASE_DIR, 'data', ver)):
-        if filename.startswith(code):
-            df_stockfeatures = pd.read_csv(
-                os.path.join(settings.BASE_DIR, 'data', ver, filename),
-                thousands=',', header=0, converters={'date': lambda x: str(x)})
-            break
+    engine = create_engine(os.environ.get("DATABASE_URL"))
 
-    # print(df_marketfeatures.head(2))
-    # print(df_stockfeatures.head(2))
+    # 종목 데이터
+    stock_query = (f"SELECT * FROM stocks "
+             f"where stockcode='{code}' AND "
+             f"date>={date_from} AND "
+             f"date<={date_to};")
+    df_stockfeatures = pd.read_sql_query(con=engine.connect(), sql=sql_text(stock_query))
+    df_stockfeatures = df_stockfeatures.iloc[:, :-2]
+
+    # 시장 데이터
+    market_query = (f"SELECT * FROM marketfeatures "
+                    f"WHERE date>={date_from} AND date<={date_to};")
+
+    df_marketfeatures = pd.read_sql_query(con=engine.connect(), sql=sql_text(market_query))
+
     # 시장 데이터와 종목 데이터 합치기
     df = pd.merge(df_stockfeatures, df_marketfeatures, on='date', how='left', suffixes=('', '_dup'))
     df = df.drop(df.filter(regex='_dup$').columns.tolist(), axis=1)
 
     # 날짜 오름차순 정렬
     df = df.sort_values(by='date').reset_index(drop=True)
-
-    # 기간 필터링
-    df['date'] = df['date'].str.replace('-', '')
-    df = df[(df['date'] >= str(date_from)) & (df['date'] <= str(date_to))]
-    df = df.fillna(method='ffill').reset_index(drop=True)
 
     # 데이터 조정
     df.loc[:, ['per', 'pbr', 'roe']] = df[['per', 'pbr', 'roe']].apply(lambda x: x / 100)
