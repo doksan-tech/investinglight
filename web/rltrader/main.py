@@ -7,7 +7,7 @@ from . import utils, settings, data_manager
 def rltrader(mode='train', ver='v3', name='', stock_code_list=['005930'],
              rl_method='a2c', net='dnn', backend='pytorch',
              start_date=20200101, end_date=20201231, 
-             lr=0.0001, discount_factor=0.9, balance=100_000_000):
+             lr=0.0001, discount_factor=0.9, balance=100_000_000, features=[]):
     print('--------------main.py 시작--------------------')
     output_name = f'{mode}_{stock_code_list[0]}_{rl_method}_{net}'
     learning = mode in ['train', 'update']
@@ -87,6 +87,10 @@ def rltrader(mode='train', ver='v3', name='', stock_code_list=['005930'],
         # 차트 데이터(ohlcv), 학습 데이터(per 등) 준비
         chart_data, training_data = data_manager.load_data(
             stock_code, start_date, end_date, ver=ver)
+
+        # 선택한 데이터로만 학습
+        training_data = training_data[features]
+
 
         # assert : 뒤의 조건이 True가 아니면 AssertError를 발생
         # num_stepsdls : lstm, cnn -> 5, else -> 1
