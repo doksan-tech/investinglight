@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container mt-3">
   <form action="/register" method="post">
+<div class="container  mt-3">
+  <div class="row">
+  <div class="col-6">
     <div class="mb-0">
       <label class="form-label" for="mode">작업 선택</label><br>
       <select class="form-select mb-4" name="mode" id="mode">
@@ -43,7 +45,25 @@
         <input id="e_date" type="date" name="end_date" class="form-control"><br>
       </div>
     </div>
-    <input type="submit" value="SUBMIT" class="btn btn-primary">
-  </form>
+    </div>
+  <div class="col-6">
+    <div  class="d-flex flex-column">
+      <fieldset class="border rounded-3 p-3">
+      <legend class="float-none w-auto px-3">학습 데이터 선택</legend>
+      {% for i in range(features | length) %}
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="features" name="features" value={{features[i]}} checked>
+          <label class="form-check-label" for="features">{{labels[i]}}</label>
+        </div>
+<!--        {% if (i+1) % 2 == 0 %}-->
+<!--        <br>-->
+<!--        {% endif %}-->
+      {% endfor %}
+      </fieldset>
+    </div>
+    </div>
+    </div>
+    <input type="submit" value="SUBMIT" class="btn btn-primary mt-3 mb-5">
 </div>
+  </form>
 {% endblock %}

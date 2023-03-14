@@ -1,4 +1,5 @@
 import requests
+import os
 from os import environ
 import pandas as pd
 from flask import Blueprint, url_for, request, redirect, render_template, jsonify
@@ -16,9 +17,67 @@ def home():
 @bp.route('/register', methods=['get','post'])
 def register():
     if request.method == 'GET':
-        return render_template("register.html")
+        engine = create_engine(os.environ.get("DATABASE_URL"))
+        sql_1 = "SELECT * FROM stocks LIMIT 1;"
+        sql_2 = "SELECT * FROM marketfeatures LIMIT 1;"
+        sql_3 = "SELECT DISTINCT stockname, stockcode FROM stocks;"
+        stockfeatures = pd.read_sql_query(con=engine.connect(), sql=sql_text(sql_1)).columns.to_list()
+        marketfeatures = pd.read_sql_query(con=engine.connect(), sql=sql_text(sql_2)).columns.to_list()
+        # stocks = pd.read_sql_query(con=engine.connect(), sql=sql_text(sql_3))
+        features = stockfeatures[6:-2] + marketfeatures[1:] # date, stockcode, stockname 제외
+        labels = [
+            'PER',
+            'PBR',
+            'ROE',
+            '전일 종가 대비 당일 시가 비율',
+            '당일 고가 대비 종가 비율',
+            '당일 저가 대비 종가 비율',
+            '종가등락률',
+            '전일 거래량 대비 당일 거래량 비율',
+            '5일 이동평균 종가 대비 당일 종가',
+            '5일 이동평균 거래량 대비 당일 거래량',
+            '10일 이동평균 종가 대비 당일 종가',
+            '10일 이동평균 거래량 대비 당일 거래량',
+            '20일 이동평균 종가 대비 당일 종가',
+            '20일 이동평균 거래량 대비 당일 거래량',
+            '60일 이동평균 종가 대비 당일 종가',
+            '60일 이동평균 거래량 대비 당일 거래량',
+            '120일 이동평균 종가 대비 당일 종가',
+            '120일 이동평균 거래량 대비 당일 거래량',
+            '개인투자자 거래량',
+            '개인투자자 전일 거래량과 당일 거래량 차이',
+            '개인투자자 5일 이동평균 거래량',
+            '개인투자자 10일 이동평균  거래량',
+            '개인투자자 20일 이동평균  거래량',
+            '개인투자자 60일 이동평균  거래량',
+            '개인투자자 120일 이동평균 거래량',
+            '기관투자자 거래량',
+            '기관투자자 전일 거래량과 당일 거래량 차이',
+            '기관투자자 5일 이동평균 거래량',
+            '기관투자자 10일 이동평균 거래량',
+            '기관투자자 20일 이동평균 거래량',
+            '기관투자자 60일 이동평균 거래량',
+            '기관투자자 120일 이동평균 거래량',
+            '외국인투자자 거래량',
+            '외국인투자자 전일 거래량과 당일 거래량 차이',
+            '외국인투자자 5일 이동평균 거래량',
+            '외국인투자자 10일 이동평균 거래량',
+            '외국인투자자 20일 이동평균 거래량',
+            '외국인투자자 60일 이동평균 거래량',
+            '외국인투자자 120일 이동평균 거래량',
+            '코스피 5일 이동평균 대비 당일 비율',
+            '코스피 20일 이동평균 대비 당일 비율',
+            '코스피 60일 이동평균 대비 당일 비율',
+            '코스피 120일 이동평균 대비 당일 비율',
+            '한국 국채 3년물 5일 이동평균 대비 당일 비율',
+            '한국 국채 3년물 20일 이동평균 대비 당일 비율',
+            '한국 국채 3년물 60일 이동평균 대비 당일 비율',
+            '한국 국채 3년물 120일 이동평균 대비 당일 비율'
+        ]
+        print(len(features), len(labels))
+        return render_template("register.html", features=features, labels=labels)
     elif request.method == 'POST':
-        stock_code = ['005930']     # TODO: 수정
+        stock_code = ['000100']     # TODO: 수정
         engine = create_engine(environ.get("DATABASE_URL"))
 
         mode = request.form["mode"]
@@ -27,7 +86,8 @@ def register():
         net = request.form["network"]
         start_date = str(request.form["start_date"]).replace('-', '')
         end_date = str(request.form["end_date"]).replace('-', '')
-        print(start_date)
+        features = request.form.getlist('features')
+
         # ch_sname = "'"+stock_name+"'"
         # query = "select distinct stockcode from stocks where stockname="+ch_sname+";"
         # df_sname = pd.read_sql_query(con=engine.connect(), sql=sql_text(query))
@@ -52,5 +112,5 @@ def register():
         rltrader(mode=mode, stock_code_list=stock_code,
                 rl_method=rl_method,  net=net,
                 start_date=start_date, end_date=end_date,
-                )
+                features=features)
         return render_template("result.html")

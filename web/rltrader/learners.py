@@ -242,7 +242,7 @@ class ReinforcementLearner:
         epoch_win_cnt = 0
 
         # 에포크 반복
-        for epoch in tqdm(range(self.num_epoches)):
+        for epoch in tqdm(range(self.num_epoches), position=0, leave=True):
             time_start_epoch = time.time()
 
             # step 샘플을 만들기 위한 큐
@@ -257,7 +257,7 @@ class ReinforcementLearner:
             else:
                 epsilon = self.start_epsilon
 
-            for i in tqdm(range(len(self.training_data)), leave=False):
+            for i in tqdm(range(len(self.training_data)), position=0, leave=True):
                 # 샘플 생성
                 next_sample = self.build_sample()
                 if next_sample is None:
